@@ -1,0 +1,202 @@
+{
+  "job_id": 243565730464543,
+  "creator_user_name": "<email>",
+  "run_as_user_name": "<email>",
+  "run_as_owner": true,
+  "settings": {
+    "name": "End-to-End Pipeline",
+    "email_notifications": {
+      "no_alert_for_skipped_runs": false
+    },
+    "webhook_notifications": {},
+    "timeout_seconds": 0,
+    "max_concurrent_runs": 1,
+    "tasks": [
+      {
+        "task_key": "Parameters",
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/<email>/Databricks ETE/parameters",
+          "source": "WORKSPACE"
+        },
+        "job_cluster_key": "Job_cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Bronze_Autoloader",
+        "depends_on": [
+          {
+            "task_key": "Parameters"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "for_each_task": {
+          "inputs": "{{tasks.Parameters.values.output_datasets}}",
+          "task": {
+            "task_key": "Bronze_Autoloader_iteration",
+            "run_if": "ALL_SUCCESS",
+            "notebook_task": {
+              "notebook_path": "/Workspace/Users/<email>/Databricks ETE/Bronze_Layer",
+              "base_parameters": {
+                "file_name": "{{input.file_name}}"
+              },
+              "source": "WORKSPACE"
+            },
+            "job_cluster_key": "Job_cluster",
+            "timeout_seconds": 0,
+            "email_notifications": {},
+            "webhook_notifications": {}
+          }
+        },
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Silver_Customers",
+        "depends_on": [
+          {
+            "task_key": "Bronze_Autoloader"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/<email>/Databricks ETE/Silver_Customers",
+          "source": "WORKSPACE"
+        },
+        "job_cluster_key": "Job_cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Silver_Orders",
+        "depends_on": [
+          {
+            "task_key": "Bronze_Autoloader"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/<email>/Databricks ETE/Silver_Orders",
+          "source": "WORKSPACE"
+        },
+        "job_cluster_key": "Job_cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Silver_Products",
+        "depends_on": [
+          {
+            "task_key": "Bronze_Autoloader"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/<email>/Databricks ETE/Silver_Products",
+          "source": "WORKSPACE"
+        },
+        "job_cluster_key": "Job_cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Gold_Customers",
+        "depends_on": [
+          {
+            "task_key": "Silver_Customers"
+          },
+          {
+            "task_key": "Silver_Orders"
+          },
+          {
+            "task_key": "Silver_Products"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/<email>/Databricks ETE/Gold_Customers",
+          "source": "WORKSPACE"
+        },
+        "job_cluster_key": "Job_cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Gold_products",
+        "depends_on": [
+          {
+            "task_key": "Silver_Orders"
+          },
+          {
+            "task_key": "Silver_Products"
+          },
+          {
+            "task_key": "Silver_Customers"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "pipeline_task": {
+          "pipeline_id": "6283e9d1-9d1e-41fc-80e0-20141ec3364c",
+          "full_refresh": false
+        },
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      },
+      {
+        "task_key": "Fact_Orders",
+        "depends_on": [
+          {
+            "task_key": "Gold_Customers"
+          },
+          {
+            "task_key": "Gold_products"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/<email>/Databricks ETE/Gold_Orders",
+          "source": "WORKSPACE"
+        },
+        "job_cluster_key": "Job_cluster",
+        "timeout_seconds": 0,
+        "email_notifications": {}
+      }
+    ],
+    "job_clusters": [
+      {
+        "job_cluster_key": "Job_cluster",
+        "new_cluster": {
+          "cluster_name": "",
+          "spark_version": "16.4.x-scala2.12",
+          "azure_attributes": {
+            "first_on_demand": 1,
+            "availability": "SPOT_WITH_FALLBACK_AZURE",
+            "spot_bid_max_price": -1.0
+          },
+          "node_type_id": "Standard_D4ds_v4",
+          "spark_env_vars": {
+            "PYSPARK_PYTHON": "/databricks/python3/bin/python3"
+          },
+          "enable_elastic_disk": true,
+          "data_security_mode": "SINGLE_USER",
+          "runtime_engine": "PHOTON",
+          "num_workers": 8
+        }
+      }
+    ],
+    "format": "MULTI_TASK",
+    "queue": {
+      "enabled": true
+    },
+    "performance_target": "PERFORMANCE_OPTIMIZED"
+  },
+  "created_time": 1763077633826
+}

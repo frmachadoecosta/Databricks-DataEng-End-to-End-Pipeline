@@ -1,0 +1,47 @@
+{
+  "pipeline_id": "6283e9d1-9d1e-41fc-80e0-20141ec3364c",
+  "spec": {
+    "id": "6283e9d1-9d1e-41fc-80e0-20141ec3364c",
+    "pipeline_type": "WORKSPACE",
+    "name": "Gold_Prods3",
+    "clusters": [
+      {
+        "label": "default",
+        "node_type_id": "Standard_D4s_v3",
+        "driver_node_type_id": "Standard_D4s_v3",
+        "autoscale": {
+          "min_workers": 1,
+          "max_workers": 5,
+          "mode": "ENHANCED"
+        }
+      }
+    ],
+    "libraries": [
+      {
+        "notebook": {
+          "path": "/Users/<email>/Databricks ETE/Gold_Products"
+        }
+      }
+    ],
+    "schema": "gold",
+    "continuous": false,
+    "development": true,
+    "photon": false,
+    "edition": "ADVANCED",
+    "channel": "CURRENT",
+    "catalog": "databricks_cat",
+    "serverless": false
+  },
+  "state": "IDLE",
+  "name": "Gold_Prods3",
+  "creator_user_name": "<email>",
+  "latest_updates": [
+    {
+      "update_id": "639881af-8aa2-422b-9497-d0f9e10c1f40",
+      "state": "COMPLETED",
+      "creation_time": "2025-11-12T00:17:50.887Z"
+    }
+  ],
+  "last_modified": 1763122494622,
+  "run_as_user_name": "<email>"
+}

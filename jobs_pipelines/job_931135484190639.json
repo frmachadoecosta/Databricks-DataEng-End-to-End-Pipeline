@@ -1,0 +1,73 @@
+{
+  "job_id": 931135484190639,
+  "creator_user_name": "<email>",
+  "run_as_user_name": "<email>",
+  "run_as_owner": true,
+  "settings": {
+    "name": "Bronze_Incremental",
+    "email_notifications": {
+      "no_alert_for_skipped_runs": false
+    },
+    "webhook_notifications": {},
+    "timeout_seconds": 0,
+    "max_concurrent_runs": 1,
+    "tasks": [
+      {
+        "task_key": "Parameters",
+        "run_if": "ALL_SUCCESS",
+        "notebook_task": {
+          "notebook_path": "/Workspace/Users/<email>/Databricks ETE/parameters",
+          "source": "WORKSPACE"
+        },
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {},
+        "environment_key": "Parameters_environment"
+      },
+      {
+        "task_key": "Bronze_Autoloader",
+        "depends_on": [
+          {
+            "task_key": "Parameters"
+          }
+        ],
+        "run_if": "ALL_SUCCESS",
+        "for_each_task": {
+          "inputs": "{{tasks.Parameters.values.output_datasets}}",
+          "task": {
+            "task_key": "Bronze_Autoloader_iteration",
+            "run_if": "ALL_SUCCESS",
+            "notebook_task": {
+              "notebook_path": "/Workspace/Users/<email>/Databricks ETE/Bronze_Layer",
+              "base_parameters": {
+                "file_name": "{{input.file_name}}"
+              },
+              "source": "WORKSPACE"
+            },
+            "timeout_seconds": 0,
+            "email_notifications": {},
+            "webhook_notifications": {},
+            "environment_key": "Parameters_environment"
+          }
+        },
+        "timeout_seconds": 0,
+        "email_notifications": {},
+        "webhook_notifications": {}
+      }
+    ],
+    "format": "MULTI_TASK",
+    "queue": {
+      "enabled": true
+    },
+    "environments": [
+      {
+        "environment_key": "Parameters_environment",
+        "spec": {
+          "environment_version": "4"
+        }
+      }
+    ],
+    "performance_target": "PERFORMANCE_OPTIMIZED"
+  },
+  "created_time": 1762349135747
+}
